@@ -49,6 +49,7 @@ process cellbender__preprocess_output {
     )  
     tuple(
       val(experiment_id),
+      val(biopsy_type),
       path("*_unfiltered.h5"),
       path(expected_cells),
       path(total_droplets_include),
@@ -56,6 +57,7 @@ process cellbender__preprocess_output {
     )
     tuple(
       val(experiment_id),
+      val(biopsy_type),
       path(file_10x_barcodes),
       path(file_10x_features),
       path(file_10x_matrix),
@@ -63,6 +65,7 @@ process cellbender__preprocess_output {
       emit: experiment_id_cb_plot_input
     )
     tuple(
+      val(biopsy_type),
       path(file_10x_barcodes),
       path(file_10x_features),
       path(file_10x_matrix),

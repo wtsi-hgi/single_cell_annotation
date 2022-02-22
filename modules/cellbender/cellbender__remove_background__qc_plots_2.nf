@@ -16,6 +16,7 @@ process cellbender__remove_background__qc_plots_2 {
   
   input:
     tuple val(experiment_id),
+	val(biopsy_type)
 	path(cellbender_unfiltered_h5s),
 	path(expectedcells),
 	path(totaldropletsinclude),
