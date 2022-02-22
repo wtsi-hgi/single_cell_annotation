@@ -106,18 +106,13 @@ workflow cellbender_workflow {
         cellbender__preprocess_output.out.experiment_id_cb_plot_input)
 
     // Make secondary set of QC plots, comparing cellbender and cellranger filtered outputs
-    cellbender__preprocess_output.out.experimentid_outdir_cellbenderunfiltered_expectedcells_totaldropletsinclude
-        .combine(ch_experimentid_paths10x_raw, by: 0)
-        .combine(ch_experimentid_paths10x_filtered, by: 0)
-        .combine(Channel.from("${params.cellbender.fpr.value}"
-			      .replaceFirst(/]$/,"")
-			      .replaceFirst(/^\[/,"")
-			      .split()))
-        .set{input_channel_qc_plots_2}
+    cellbender__remove_background__qc_plots_2(
+	cellbender__preprocess_output.out.qc_plots_2
+            .combine(ch_experimentid_paths10x_raw, by: 0)
+            .combine(ch_experimentid_paths10x_filtered, by: 0))
     
-    cellbender__remove_background__qc_plots_2(input_channel_qc_plots_2)
-//    
-//    
+    
+   
     emit:
     filt10x = cellbender__preprocess_output.out.filt10x
 }

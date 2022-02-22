@@ -16,15 +16,13 @@ process cellbender__remove_background__qc_plots_2 {
   
   input:
     tuple val(experiment_id),
-	val(biopsy_type)
+	val(biopsy_type),
+	val(fpr),
 	path(cellbender_unfiltered_h5s),
 	path(expectedcells),
 	path(totaldropletsinclude),
 	path(raw_cellranger_mtx),
-	path(filtered_cellranger_mtx),
-	val(fpr),
-	val(biopsy_type)
-    // tuple val(experiment_id), val(outdir), path(cellbender_unfiltered_h5s), path(expectedcells), path(totaldropletsinclude), path(raw_cellranger_mtx), path(filtered_cellranger_mtx), val(fpr)
+	path(filtered_cellranger_mtx)
 
     output:
     path("fpr_${fpr}/${experiment_id}/*.png"), emit: plots_png 

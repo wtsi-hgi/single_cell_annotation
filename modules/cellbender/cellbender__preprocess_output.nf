@@ -49,11 +49,12 @@ process cellbender__preprocess_output {
     )  
     tuple(
       val(experiment_id),
-      val(biopsy_type),
-      path("*_unfiltered.h5"),
-      path(expected_cells),
-      path(total_droplets_include),
-      emit: experimentid_outdir_cellbenderunfiltered_expectedcells_totaldropletsinclude
+	val(biopsy_type),
+	val(fpr),
+	path("*_unfiltered.h5"),
+	path(expected_cells),
+	path(total_droplets_include),
+	emit: qc_plots_2
     )
     tuple(
       val(experiment_id),
