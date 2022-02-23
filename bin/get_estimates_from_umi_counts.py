@@ -1,26 +1,20 @@
 #!/usr/bin/env python
 
-__author__ = 'Leland Taylor'
-__date__ = '2020-07-03'
+
+__date__ = '2022-02-23'
 __version__ = '0.0.1'
 
 import argparse
-#import csv
+# import csv
 import os
-os.environ['NUMBA_CACHE_DIR']='/tmp'
-os.environ['MPLCONFIGDIR']='/tmp'
 import random
 import numpy as np
 import pandas as pd
-
+import scanpy as sc
 import plotnine as plt9
 from kneed import KneeLocator
 from distutils.version import LooseVersion
 from scipy.interpolate import UnivariateSpline
-
-
-import scanpy as sc
-
 
 # To resolve strange TclError for interactive job
 import matplotlib
@@ -34,6 +28,10 @@ os.environ['PYTHONHASHSEED'] = str(seed_value)
 random.seed(seed_value)
 # 2. Set `numpy` pseudo-random generator at a fixed value
 np.random.seed(seed_value)
+
+# Set env vars
+os.environ['NUMBA_CACHE_DIR']='/tmp'
+os.environ['MPLCONFIGDIR']='/tmp'
 
 # Set valid methods for estimators
 valid_methods = [
@@ -466,6 +464,20 @@ def main():
             value. (default: %(default)s)'
     )
     parser.add_argument(
+        '--min_ranked_barcode_cell_droplet_dist',
+        action='store',
+        dest='min_ranked_barcode_cell_droplet_dist',
+        default=1000,
+        type=int,
+        help='Cell barcodes are ranked by the number of UMI counts in the \
+            cell. Minimum distance between the cell and droplet ranked \
+            barcode cutoffs. If dropet_umirank_cutoff - cell_umirank_cutoff \
+            is less than this value, move cell_umirank_cutoff to make the \
+            difference equal this value. This rule is applied even if the \
+            user specifies a specific value for both cutoffs. \
+            (default: %(default)s)'
+    )
+    parser.add_argument(
         '-of', '--output_file',
         action='store',
         dest='of',
@@ -496,6 +508,9 @@ def main():
         options.subtract_dropletfactor_estimated_ndroplets
     )
     min_ndroplets = options.min_ndroplets
+    min_ranked_barcode_cell_droplet_dist = (
+        options.min_ranked_barcode_cell_droplet_dist
+    )
     output_file = options.of
     verbose = True
 
@@ -524,102 +539,7 @@ def main():
     })
     df['barcode'] = df.index + 1
 
-    # Make an analysis df using lower bound
-    df_analysis = df.loc[df['umi_counts'] >= lb_estimated_ncells, :]
-    df_analysis = df_analysis.reset_index(drop=True)
-    # Get dropletutils estimates
-    right_edge, left_edge, result_dropletutils = dropletutils_cutoff(
-        df_analysis
-    )
-    # Get kneedle estimates
-    result_kneedle = kneedle_cutoff(df_analysis, verbose=False)
-    # Save the results to a list we will turn into a pandas matrix
-    cell_estimate_outdict = []
-    for i in result_dropletutils:
-        cell_estimate_outdict.append(i)
-    for i in result_kneedle:
-        cell_estimate_outdict.append(i)
-
-    # Set expected number of cells if we have some
-    if options.expected_ncells != 0:
-        # NOTE: with specific esimates, we should use the raw df
-        method_ncells = 'expected'
-        cell_estimate_outdict.append({
-            'method': 'expected',
-            'umi_counts_cutoff': df['umi_counts'][options.expected_ncells],
-            'n_cells': options.expected_ncells
-        })
-        # If we have expected number of cells, then go ahead and
-        # also estimate like CellRanger2.
-        # Assumes a ~10-fold range of library sizes for real cells and
-        # estimates this range using the expected number of cells.
-        # https://scrnaseq-course.cog.sanger.ac.uk/website/processing-raw-scrna-seq-data.html
-        # 99th percentile of top n_cells divided by 10
-        #
-        # NOTE: with specific esimates, we should use the raw df
-        cellranger_expected_knee = df['umi_counts'][
-            round(0.01*options.expected_ncells)
-        ]/10
-        cell_estimate_outdict.append({
-            'method': 'cellrangerv2::expected',
-            'umi_counts_cutoff': cellranger_expected_knee,
-            'n_cells': (df['umi_counts'] >= cellranger_expected_knee).sum()
-        })
-
-    # Make a dataframe of all of the different knee calculations
-    # NOTE: here knee is the number of cells that would be kept at that
-    # threshold
-    df_estimate_ncells = pd.DataFrame(cell_estimate_outdict)
-    # Add the fit of the droplet utils model
-    # df_fit = pd.DataFrame({
-    #     'y': 10 ** dropletutils_fit(x),
-    #     'x': 10 ** x
-    # })
-
-    # Get the final number of estimated cells
-    estimated_ncells, estimated_ncells_method = get_final_estimates(
-        df_estimates=df_estimate_ncells,
-        method=method_ncells,
-        subtract_n_factor=0,
-        verbose=verbose
-    )
-    # Add the final estimate to the output dict
-    cell_estimate_outdict.append({
-        'method': 'estimated_ncells',
-        'umi_counts_cutoff': 0,
-        'n_cells': estimated_ncells
-    })
-    df_estimate_ncells = pd.DataFrame(cell_estimate_outdict)
-
-    # Save all of our estimates
-    df_estimate_ncells.to_csv(
-        '{}-cell_estimate_cutoff.tsv.gz'.format(output_file),
-        sep='\t',
-        compression=compression_opts,
-        index=False,
-        header=True
-    )
-    # Save the final estimates
-    with open('{}-expected_cells.txt'.format(output_file), 'w') as f:
-        f.write(str(int(estimated_ncells)))
-
-    # Make a plot of the different cutoffs
-    _ = estimate_cutoffs_plot(
-        '{}-cell_estimate_cutoffs-zoomed'.format(output_file),
-        df_analysis,
-        df_estimate_ncells,
-        # df_fit=df_fit,
-        scale_x_log10=False
-    )
-    _ = estimate_cutoffs_plot(
-        '{}-cell_estimate_cutoffs'.format(output_file),
-        df,
-        df_estimate_ncells,
-        # df_fit=df_fit,
-        scale_x_log10=True
-    )
-
-    # Run a similar proceedure but for total-droplets-included.
+    # Get estimates for total-droplets-included.
     # ...these will be the lower bound of the droplets used to estimate the
     # background signals
     # Make an analysis df using lower bound
@@ -738,6 +658,112 @@ def main():
         # df_fit=df_fit,
         scale_x_log10=True
     )
+    ###########################################################################
+
+    # Get estimates for number of cells
+    df_analysis = df.loc[df['umi_counts'] >= lb_estimated_ncells, :]
+    df_analysis = df_analysis.reset_index(drop=True)
+    # Get dropletutils estimates
+    right_edge, left_edge, result_dropletutils = dropletutils_cutoff(
+        df_analysis
+    )
+    # Get kneedle estimates
+    result_kneedle = kneedle_cutoff(df_analysis, verbose=False)
+    # Save the results to a list we will turn into a pandas matrix
+    cell_estimate_outdict = []
+    for i in result_dropletutils:
+        cell_estimate_outdict.append(i)
+    for i in result_kneedle:
+        cell_estimate_outdict.append(i)
+
+    # Set expected number of cells if we have some
+    if options.expected_ncells != 0:
+        # NOTE: with specific esimates, we should use the raw df
+        method_ncells = 'expected'
+        cell_estimate_outdict.append({
+            'method': 'expected',
+            'umi_counts_cutoff': df['umi_counts'][options.expected_ncells],
+            'n_cells': options.expected_ncells
+        })
+        # If we have expected number of cells, then go ahead and
+        # also estimate like CellRanger2.
+        # Assumes a ~10-fold range of library sizes for real cells and
+        # estimates this range using the expected number of cells.
+        # https://scrnaseq-course.cog.sanger.ac.uk/website/processing-raw-scrna-seq-data.html
+        # 99th percentile of top n_cells divided by 10
+        #
+        # NOTE: with specific esimates, we should use the raw df
+        cellranger_expected_knee = df['umi_counts'][
+            round(0.01*options.expected_ncells)
+        ]/10
+        cell_estimate_outdict.append({
+            'method': 'cellrangerv2::expected',
+            'umi_counts_cutoff': cellranger_expected_knee,
+            'n_cells': (df['umi_counts'] >= cellranger_expected_knee).sum()
+        })
+
+    # Make a dataframe of all of the different knee calculations
+    # NOTE: here knee is the number of cells that would be kept at that
+    # threshold
+    df_estimate_ncells = pd.DataFrame(cell_estimate_outdict)
+    # Add the fit of the droplet utils model
+    # df_fit = pd.DataFrame({
+    #     'y': 10 ** dropletutils_fit(x),
+    #     'x': 10 ** x
+    # })
+
+    # Get the final number of estimated cells
+    estimated_ncells, estimated_ncells_method = get_final_estimates(
+        df_estimates=df_estimate_ncells,
+        method=method_ncells,
+        subtract_n_factor=0,
+        verbose=verbose
+    )
+    if min_ranked_barcode_cell_droplet_dist != 0:
+        diff = estimated_ndroplets - estimated_ncells
+        if diff < 0:
+            raise Exception(
+                'estimated_ndroplets - estimated_ncells is negative!'
+            )
+        if diff < min_ranked_barcode_cell_droplet_dist:
+            estimated_ncells = estimated_ncells - diff
+    # Add the final estimate to the output dict
+    cell_estimate_outdict.append({
+        'method': 'estimated_ncells',
+        'umi_counts_cutoff': 0,
+        'n_cells': estimated_ncells
+    })
+    df_estimate_ncells = pd.DataFrame(cell_estimate_outdict)
+
+    # Save all of our estimates
+    df_estimate_ncells.to_csv(
+        '{}-cell_estimate_cutoff.tsv.gz'.format(output_file),
+        sep='\t',
+        compression=compression_opts,
+        index=False,
+        header=True
+    )
+    # Save the final estimates
+    with open('{}-expected_cells.txt'.format(output_file), 'w') as f:
+        f.write(str(int(estimated_ncells)))
+
+    # Make a plot of the different cutoffs
+    _ = estimate_cutoffs_plot(
+        '{}-cell_estimate_cutoffs-zoomed'.format(output_file),
+        df_analysis,
+        df_estimate_ncells,
+        # df_fit=df_fit,
+        scale_x_log10=False
+    )
+    _ = estimate_cutoffs_plot(
+        '{}-cell_estimate_cutoffs'.format(output_file),
+        df,
+        df_estimate_ncells,
+        # df_fit=df_fit,
+        scale_x_log10=True
+    )
+    ###########################################################################
+
 
     # Plot the final estimates togher
     final_cutoffs = []
@@ -773,7 +799,7 @@ def main():
         save_plot=True,
         add_text=True
     )
-
+    ###########################################################################
 
 if __name__ == '__main__':
     main()
