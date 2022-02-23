@@ -1239,23 +1239,24 @@ def main():
                 compression_opts=compression_level
             )
 
-            # Plot the original label and the average probability of each
-            # new cell type label for each original label
-            # Across good cells
-            plot_old_vs_new_cell_labels(
-                adata_filtered,
-                old_label=h5_cluster_col,
-                new_label='predicted_celltype',
-                plot_type='n_cells',
-                out_file_base='{}-kept_cells'.format(out_file_filter)
-            )
-            plot_old_vs_new_cell_labels(
-                adata_filtered,
-                old_label=h5_cluster_col,
-                new_label='predicted_celltype',
-                plot_type='avg_prob',
-                out_file_base='{}-kept_cells'.format(out_file_filter)
-            )
+            if h5_cluster_col != 'None':
+                # Plot the original label and the average probability of each
+                # new cell type label for each original label
+                # Across good cells
+                plot_old_vs_new_cell_labels(
+                    adata_filtered,
+                    old_label=h5_cluster_col,
+                    new_label='predicted_celltype',
+                    plot_type='n_cells',
+                    out_file_base='{}-kept_cells'.format(out_file_filter)
+                )
+                plot_old_vs_new_cell_labels(
+                    adata_filtered,
+                    old_label=h5_cluster_col,
+                    new_label='predicted_celltype',
+                    plot_type='avg_prob',
+                    out_file_base='{}-kept_cells'.format(out_file_filter)
+                )
 
 
 if __name__ == '__main__':
