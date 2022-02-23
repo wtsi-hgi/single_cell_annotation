@@ -55,7 +55,7 @@ process run_scrublet {
         ln --physical ${file_10x_barcodes} \$TMP_DIR
         ln --physical ${file_10x_features} \$TMP_DIR
         ln --physical ${file_10x_matrix} \$TMP_DIR
-        python ${projectDir}/../bin/0015-run_scrublet.py \
+        python ${projectDir}/../bin/0015-run_scrublet-cdi_version.py \
             --tenxdata_dir \$TMP_DIR \
             --expected_multiplet_rate ${expected_multiplet_rate} \
             --n_simulated_multiplet ${n_simulated_multiplet} \
