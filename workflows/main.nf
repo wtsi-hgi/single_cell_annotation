@@ -241,7 +241,7 @@ workflow.onComplete {
     log.info "\n --- Command line: $workflow.commandLine"
     log.info "\n --- Execution status: ${ workflow.success ? 'OK' : 'failed' }\n"
 
-    if (params.on_complete_remove_workdir_failed_tasks) {
+    if (params.on_complete.sync_results_to_gitlab) {
 	log.info "\n --- Sync results to gitlab: run script bin/sync_results_to_gitlab.sh\n"
 	def proc = "bash ${projectDir}/../bin/sync_results_to_gitlab.sh ${projectDir}/../results".execute()
 	def b = new StringBuffer()

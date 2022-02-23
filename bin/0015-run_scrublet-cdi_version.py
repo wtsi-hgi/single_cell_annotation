@@ -308,6 +308,37 @@ def run_scrublet(
     )
 
     # EDIT for CI pipeline: Save the anndata
+    # First add in the required columns
+    # Add a raw counts layer.
+    # NOTE: This stays with the main AnnData and is not stashed when we
+    #       later save the ln(CPM+1) data to raw (raw only stores X without
+    #       layers).
+    adata.layers['counts'] = adata.X.copy()
+
+    # Total-count normalize (library-size correct) the data matrix X to
+    # counts per million, so that counts become comparable among cells.
+    sc.pp.normalize_total(
+        adata,
+        target_sum=1e4,
+        exclude_highly_expressed=False,
+        key_added='normalization_factor',  # add to adata.obs
+        inplace=True
+    )
+    # Logarithmize the data: X = log(X + 1) where log = natural logorithm.
+    # Numpy has a nice function to undo this np.expm1(adata.X).
+    sc.pp.log1p(adata)
+    # Delete automatically added uns - UPDATE: bad idea to delete as this slot
+    # is used in _highly_variable_genes_single_batch.
+    # del adata.uns['log1p']
+    # Add record of this operation.
+    # adata.layers['log1p_cpm'] = adata.X.copy()
+    # adata.uns['log1p_cpm'] = {'transformation': 'ln(CPM+1)'}
+    adata.layers['log1p_cp10k'] = adata.X.copy()
+    adata.uns['log1p_cp10k'] = {'transformation': 'ln(CP10k+1)'}
+
+    # Reset X to counts
+    adata.X = adata.layers['counts'].copy()
+
     adata.write(
         '{}-scrublet.h5ad'.format(out_file_base),
         compression='gzip',

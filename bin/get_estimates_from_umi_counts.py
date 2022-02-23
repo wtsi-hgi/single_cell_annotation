@@ -30,9 +30,9 @@ random.seed(seed_value)
 np.random.seed(seed_value)
 
 # Set env vars
-os.environ['NUMBA_CACHE_DIR']='/tmp'
-os.environ['MPLCONFIGDIR']='/tmp'
-
+os.environ['NUMBA_CACHE_DIR'] = os.getenv('TMPDIR', '/tmp')
+os.environ['MPLCONFIGDIR'] =os.getenv('TMPDIR', '/tmp')
+                    
 # Set valid methods for estimators
 valid_methods = [
     'dropletutils::barcoderanks::inflection',
