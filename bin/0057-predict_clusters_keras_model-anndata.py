@@ -1043,19 +1043,21 @@ def main():
             df_X.columns
         )
         if len(missing_cols) == 0:
-            raise Exception('Error in missing gene column processing')
+            # then the issue is not missing genes, but just a different order
+            # of genes
+            df_X_fixed = df_X
         else:
             warnings.warn(
                 'Setting expression values for {} missing genes to 0.0'.format(
                     len(missing_cols)
                 )
             )
-        # NOTE: if we get an error below it is likely because the columns
-        # are not all unique.
-        df_X_fixed = df_X.reindex(
-            columns=[*df_X.columns.tolist(), *missing_cols],
-            fill_value=0.0
-        )
+            # NOTE: if we get an error below it is likely because the columns
+            # are not all unique.
+            df_X_fixed = df_X.reindex(
+                columns=[*df_X.columns.tolist(), *missing_cols],
+                fill_value=0.0
+            )
         # for i in missing_cols:
         #     df_X[i] = 0.0  # np.nan will not work
         # Re-order the ensembl ids to fit the model
