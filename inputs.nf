@@ -12,6 +12,7 @@ params {
     run_cellbender_workflow = true
     run_multiplet_workflow = true // can only run if run_cellbender_workflow has run
     run_celltype_pred_workflow = true // can only run if run_multiplet_workflow has run
+    on_complete { sync_results_to_gitlab = true } // push some outputs to gitlab repo in workflow.onComplete{}
     
     copy_mode = "rellink" // publish relative links from work to results publish dir
     mem_gpu = 10000 // Gb RAM memory for cellbender gpu task
