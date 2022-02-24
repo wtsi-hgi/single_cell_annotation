@@ -16,7 +16,7 @@ git pull
 mkdir -p ./sync_status/keras_celltypes
 
 FULL_PATH_RESULTS=$(dirname $PWD)
-echo \`"${FULL_PATH_RESULTS}/\`" > ./sync_status/keras_celltypes/README.md
+echo \`"${FULL_PATH_RESULTS}/\`" >| ./sync_status/keras_celltypes/README.md
 git add ./sync_status/keras_celltypes/README.md
 
 # list input samples
