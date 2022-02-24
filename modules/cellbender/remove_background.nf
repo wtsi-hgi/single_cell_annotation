@@ -1,5 +1,5 @@
 
-process cellbender__remove_background {
+process remove_background {
   // Remove ambient RNA
   // ------------------------------------------------------------------------
   //tag { output_dir }

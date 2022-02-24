@@ -1,6 +1,4 @@
-
-
-process cellbender__remove_background__qc_plots_2 {
+process remove_background__qc_plots_2 {
 
 
   // Second set of QC plots from cellbdender.

@@ -1,1 +1,1 @@
-b to_bsub.sh 1 5 yesterday
+b to_bsub.sh 2 10 yesterday

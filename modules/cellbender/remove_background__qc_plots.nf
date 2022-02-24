@@ -1,4 +1,4 @@
-process cellbender__remove_background__qc_plots {
+process remove_background__qc_plots {
 
   publishDir  path: "${params.outdir}/cellbender/4.1_qc_plots/${biopsy_type}/${experiment_id}",
       saveAs: {filename ->

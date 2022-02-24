@@ -1,4 +1,4 @@
-process run_keras_cell_type_prediction {
+process run_keras_celltype_prediction {
     tag { "${experiment_id}" }
 
     publishDir  path: "${params.outdir}/celltype_prediction/1_keras/${biopsy_type}/${experiment_id}",
@@ -13,13 +13,14 @@ process run_keras_cell_type_prediction {
         )
 
     output:
-        val(experiment_id, emit: experiment_id)
-        path("${experiment_id}-scrublet.tsv.gz", emit: multiplet_calls)
-        path(
-            "${experiment_id}-multiplet_calls_published.txt",
-            emit: multiplet_calls_published
-        )
-
+    tuple(
+        val(experiment_id),
+        val(biopsy_type),
+        path("*.png"),
+        path("*_gtr_*.h5ad"),// do not capture input Pilot_study_of_dissociation_methods_for_human_gut_tissues7980357-scrublet.h5ad
+        path("*predictions.h5ad"), 
+        emit: out)
+    
     script:
         """
 python ${projectDir}/../bin/0057-predict_clusters_keras_model-anndata.py \\

@@ -1,5 +1,5 @@
-process cellbender__rb__get_input_cells {
-  // Calculates thresholds for input cells of cellbender__remove_background
+process get_input_cells {
+  // Calculates thresholds for input cells of remove_background
   // ------------------------------------------------------------------------
 
     publishDir path: "${params.outdir}/cellbender/1_get_input_cells/${biopsy_type}/${experiment_id}",

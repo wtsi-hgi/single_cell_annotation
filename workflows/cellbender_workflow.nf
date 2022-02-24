@@ -1,9 +1,9 @@
 
-include { cellbender__rb__get_input_cells } from '../modules/cellbender/cellbender__rb__get_input_cells.nf'
-include { cellbender__remove_background } from '../modules/cellbender/cellbender__remove_background.nf'
-include { cellbender__remove_background__qc_plots } from '../modules/cellbender/cellbender__remove_background__qc_plots.nf'
-include { cellbender__remove_background__qc_plots_2 } from '../modules/cellbender/cellbender__remove_background__qc_plots_2.nf'
-include { cellbender__preprocess_output } from '../modules/cellbender/cellbender__preprocess_output.nf'
+include { get_input_cells } from '../modules/cellbender/cellbender__rb__get_input_cells.nf'
+include { remove_background } from '../modules/cellbender/cellbender__remove_background.nf'
+include { remove_background__qc_plots } from '../modules/cellbender/cellbender__remove_background__qc_plots.nf'
+include { remove_background__qc_plots_2 } from '../modules/cellbender/cellbender__remove_background__qc_plots_2.nf'
+include { preprocess_output } from '../modules/cellbender/cellbender__preprocess_output.nf'
 
 workflow cellbender_workflow {
     take:
@@ -38,7 +38,7 @@ workflow cellbender_workflow {
     
     main:
     
-    cellbender__rb__get_input_cells(
+    get_input_cells(
 	channel__file_paths_10x
             .join(ncells_cellranger) 
             .join(sample_tirectum_cellbenderparams
@@ -71,8 +71,8 @@ workflow cellbender_workflow {
 				 estimate_nemptydroplets_min_drop)}))
 
 //  // Correct counts matrix to remove ambient RNA
-    cellbender__remove_background(
-        cellbender__rb__get_input_cells.out.cb_input
+    remove_background(
+        get_input_cells.out.cb_input
             .join(sample_tirectum_cellbenderparams
 		  .map {sample, biopsy_type,
 			expected_nemptydroplets_umi_cutoff, //2
@@ -99,21 +99,20 @@ workflow cellbender_workflow {
 				 fpr)}))
     
 
-    cellbender__preprocess_output(cellbender__remove_background.out.experimentid_cellbender_to_preprocess)
+    preprocess_output(cellbender__remove_background.out.experimentid_cellbender_to_preprocess)
 	
     // Make some basic plots
-    cellbender__remove_background__qc_plots(
-        cellbender__preprocess_output.out.experiment_id_cb_plot_input)
+    remove_background__qc_plots(
+        preprocess_output.out.experiment_id_cb_plot_input)
 
     // Make secondary set of QC plots, comparing cellbender and cellranger filtered outputs
-    cellbender__remove_background__qc_plots_2(
-	cellbender__preprocess_output.out.qc_plots_2
+    remove_background__qc_plots_2(
+	preprocess_output.out.qc_plots_2
             .combine(ch_experimentid_paths10x_raw, by: 0)
             .combine(ch_experimentid_paths10x_filtered, by: 0))
     
     
-   
     emit:
-    filt10x = cellbender__preprocess_output.out.filt10x
+    filt10x = preprocess_output.out.filt10x
 }
 
