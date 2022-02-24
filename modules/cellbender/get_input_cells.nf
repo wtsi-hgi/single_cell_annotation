@@ -66,7 +66,7 @@ ln --physical ${file_10x_barcodes} txd_input/barcodes.tsv.gz
 ln --physical ${file_10x_features} txd_input/features.tsv.gz
 ln --physical ${file_10x_matrix} txd_input/matrix.mtx.gz
 
-ython ${projectDir}/../bin/get_estimates_from_umi_counts.py ${cell_numbers} \\
+python ${projectDir}/../bin/get_estimates_from_umi_counts.py ${cell_numbers} \\
  --tenxdata_path txd_input \\
  --output_file ${outfile} \\
  --expected_nemptydroplets_umi_cutoff ${expected_nemptydroplets_umi_cutoff} \\
