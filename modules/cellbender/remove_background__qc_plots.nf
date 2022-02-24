@@ -25,34 +25,34 @@ process remove_background__qc_plots {
 	file(h5_filtered_cellbender)
     )
 
-  output:
+    output:
     path("plots/*.png") optional true
     path("plots/*.pdf") optional true
-
-  script:
+    
+    script:
     h5_filtered_cellbender = h5_filtered_cellbender.join(",")
-    """
-    mkdir -p txd_input
-    ln --physical ${file_10x_barcodes} txd_input/barcodes.tsv.gz
-    ln --physical ${file_10x_features} txd_input/features.tsv.gz
-    ln --physical ${file_10x_matrix} txd_input/matrix.mtx.gz
+"""
+mkdir -p txd_input
+ln --physical ${file_10x_barcodes} txd_input/barcodes.tsv.gz
+ln --physical ${file_10x_features} txd_input/features.tsv.gz
+ln --physical ${file_10x_matrix} txd_input/matrix.mtx.gz
 
-    # Make a file with list of our files
-    echo "${h5_filtered_cellbender}" | sed s/","/"\\n"/g > files.txt
+# Make a file with list of our files
+echo "${h5_filtered_cellbender}" | sed s/","/"\\n"/g > files.txt
 
-    for i in \$(cat files.txt); do
-    echo \$i
-    out_file=\$(echo \$i | sed s/".h5"//)
-    python ${projectDir}/../bin/035-analyse_cellbender_results.py \\
-      --tenxdata_path txd_input  \\
-      --h5_cellbender \$i \\
-      --output_file cellbender_results-\$out_file \\
-      --number_cpu ${task.cpus}
-    done
+for i in \$(cat files.txt); do
+echo \$i
+out_file=\$(echo \$i | sed s/".h5"//)
+python ${projectDir}/../bin/035-analyse_cellbender_results.py \\
+  --tenxdata_path txd_input  \\
+  --h5_cellbender \$i \\
+  --output_file cellbender_results-\$out_file \\
+  --number_cpu ${task.cpus}
+done
 
-    rm files.txt
-    mkdir -p plots
-    mv *pdf plots/ 2>/dev/null || true
-    mv *png plots/ 2>/dev/null || true
-    """
+rm files.txt
+mkdir -p plots
+mv *pdf plots/ 2>/dev/null || true
+mv *png plots/ 2>/dev/null || true
+"""
 }

@@ -14,8 +14,16 @@ fi
 cd ${REPO_DIR}
 git pull
 mkdir -p ./sync_status/keras_celltypes
+
 cp ../*.csv ./sync_status/keras_celltypes/
 git add ./sync_status/keras_celltypes/*.csv
+
+cp ../../reports/trace.txt ./sync_status/keras_celltypes/
+git add ./sync_status/keras_celltypes/trace.txt
+
+cp ../../reports/timeline.html ./sync_status/keras_celltypes/
+git add ./sync_status/keras_celltypes/timeline.html
+
 git commit -m "keras pipeline run complete"
 git push
 
