@@ -1,4 +1,3 @@
-
 process remove_background {
   // Remove ambient RNA
   // ------------------------------------------------------------------------
@@ -77,34 +76,34 @@ process remove_background {
     cb_params = "${cb_params}__lowcount_${low_count_threshold}"
     outfile = "cellbender"
     
-    """
-    # LD_PRELOAD to fix mkl/anaconda python error
-    # cf. https://stackoverflow.com/questions/36659453/intel-mkl-fatal-error-cannot-load-libmkl-avx2-so-or-libmkl-def-so
-    export LD_PRELOAD=/opt/conda/envs/conda_cellbender/lib/libmkl_core.so:/opt/conda/envs/conda_cellbender/lib/libmkl_sequential.so
+"""
+# LD_PRELOAD to fix mkl/anaconda python error
+# cf. https://stackoverflow.com/questions/36659453/intel-mkl-fatal-error-cannot-load-libmkl-avx2-so-or-libmkl-def-so
+export LD_PRELOAD=/opt/conda/envs/conda_cellbender/lib/libmkl_core.so:/opt/conda/envs/conda_cellbender/lib/libmkl_sequential.so
 
-    rm -fr plots
-    mkdir txd_input
-    ln --physical ${file_10x_barcodes} txd_input/barcodes.tsv.gz
-    ln --physical ${file_10x_features} txd_input/features.tsv.gz
-    ln --physical ${file_10x_matrix} txd_input/matrix.mtx.gz
+rm -fr plots
+mkdir txd_input
+ln --physical ${file_10x_barcodes} txd_input/barcodes.tsv.gz
+ln --physical ${file_10x_features} txd_input/features.tsv.gz
+ln --physical ${file_10x_matrix} txd_input/matrix.mtx.gz
 
-    cellbender remove-background --input txd_input \\
-      --cuda --output ${outfile} \\
-      --expected-cells \$(cat ${expected_cells}) \\
-      --total-droplets-included \$(cat ${total_droplets_include}) \\
-      --model full \\
-      --z-dim ${zdims} \\
-      --z-layers ${zlayers} \\
-      --low-count-threshold ${low_count_threshold} \\
-      --epochs ${epochs} \\
-      --learning-rate ${learning_rate} \\
-      --fpr ${fpr}
+cellbender remove-background --input txd_input \\
+  --cuda --output ${outfile} \\
+  --expected-cells \$(cat ${expected_cells}) \\
+  --total-droplets-included \$(cat ${total_droplets_include}) \\
+  --model full \\
+  --z-dim ${zdims} \\
+  --z-layers ${zlayers} \\
+  --low-count-threshold ${low_count_threshold} \\
+  --epochs ${epochs} \\
+  --learning-rate ${learning_rate} \\
+  --fpr ${fpr}
 
-    # If outfile does not have h5 appended to it, move it.
-    [ -f ${outfile} ] && mv ${outfile} ${outfile}.h5
+# If outfile does not have h5 appended to it, move it.
+[ -f ${outfile} ] && mv ${outfile} ${outfile}.h5
 
-    mkdir plots
-    mv *pdf plots/ 2>/dev/null || true
-    mv *png plots/ 2>/dev/null || true
-    """
+mkdir plots
+mv *pdf plots/ 2>/dev/null || true
+mv *png plots/ 2>/dev/null || true
+"""
 }

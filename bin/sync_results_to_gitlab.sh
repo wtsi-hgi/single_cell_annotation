@@ -14,8 +14,34 @@ fi
 cd ${REPO_DIR}
 git pull
 mkdir -p ./sync_status/keras_celltypes
-cp ../*.csv ./sync_status/keras_celltypes/
-git add ./sync_status/keras_celltypes/*.csv
+
+FULL_PATH_RESULTS=$(dirname $PWD)
+echo \`"${FULL_PATH_RESULTS}/\`" > ./sync_status/keras_celltypes/README.md
+git add ./sync_status/keras_celltypes/README.md
+
+# list input samples
+mkdir -p ./sync_status/keras_celltypes/inputs
+cp ../*.csv ./sync_status/keras_celltypes/inputs/
+git add ./sync_status/keras_celltypes/inputs/*.csv
+
+# add Nextflow html report and tasks trace
+cp ../../reports/trace.txt ./sync_status/keras_celltypes/
+git add ./sync_status/keras_celltypes/trace.txt
+cp ../../reports/timeline.html ./sync_status/keras_celltypes/
+git add ./sync_status/keras_celltypes/timeline.html
+
+# list all samples processed
+mkdir -p ./sync_status/keras_celltypes/cellbender
+mkdir -p ./sync_status/keras_celltypes/multiplets
+mkdir -p ./sync_status/keras_celltypes/celltypes
+find ../cellbender/3_preprocess_output -maxdepth 2 -mindepth 2 | sort -o ./sync_status/keras_celltypes/cellbender/processed_samples.txt
+find ../multiplet/1_scrublet -maxdepth 2 -mindepth 2 | sort -o ./sync_status/keras_celltypes/multiplets/processed_samples.txt
+find ../celltype_prediction/1_keras -maxdepth 2 -mindepth 2 | sort -o ./sync_status/keras_celltypes/celltypes/processed_samples.txt
+git add ./sync_status/keras_celltypes/cellbender/processed_samples.txt
+git add ./sync_status/keras_celltypes/multiplets/processed_samples.txt
+git add ./sync_status/keras_celltypes/celltypes/processed_samples.txt
+
+
 git commit -m "keras pipeline run complete"
 git push
 
