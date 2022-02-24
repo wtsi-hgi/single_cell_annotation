@@ -1,6 +1,4 @@
-
-
-process cellbender__remove_background__qc_plots_2 {
+process remove_background__qc_plots_2 {
 
 
   // Second set of QC plots from cellbdender.
@@ -28,21 +26,21 @@ process cellbender__remove_background__qc_plots_2 {
     path("fpr_${fpr}/${experiment_id}/*.png"), emit: plots_png 
 
   script:
-  """
-  fprid=\$(echo $fpr | sed s'/\\./pt/'g)
-  cellbender_unfiltered_h5=cellbender_FPR_\${fprid}_unfiltered.h5
+"""
+fprid=\$(echo $fpr | sed s'/\\./pt/'g)
+cellbender_unfiltered_h5=cellbender_FPR_\${fprid}_unfiltered.h5
 
-  n_expected_cells=\$(cat $expectedcells)
-  n_total_droplets_included=\$(cat $totaldropletsinclude)
+n_expected_cells=\$(cat $expectedcells)
+n_total_droplets_included=\$(cat $totaldropletsinclude)
 
-  python ${projectDir}/../bin/037-plot_cellranger_vs_cellbender.py \\
-    --samplename \"${experiment_id}\" \\
-    --raw_cellranger_mtx \"${raw_cellranger_mtx}\" \\
-    --filtered_cellranger_mtx \"${filtered_cellranger_mtx}\" \\
-    --cellbender_unfiltered_h5 \"\$cellbender_unfiltered_h5\" \\
-    --fpr \"${fpr}\" \\
-    --n_expected_cells \"\${n_expected_cells}\" \\
-    --n_total_droplets_included \"\${n_total_droplets_included}\" \\
-    --out_dir \$PWD
-  """
+python ${projectDir}/../bin/037-plot_cellranger_vs_cellbender.py \\
+  --samplename \"${experiment_id}\" \\
+  --raw_cellranger_mtx \"${raw_cellranger_mtx}\" \\
+  --filtered_cellranger_mtx \"${filtered_cellranger_mtx}\" \\
+  --cellbender_unfiltered_h5 \"\$cellbender_unfiltered_h5\" \\
+  --fpr \"${fpr}\" \\
+  --n_expected_cells \"\${n_expected_cells}\" \\
+  --n_total_droplets_included \"\${n_total_droplets_included}\" \\
+  --out_dir \$PWD
+"""
 }

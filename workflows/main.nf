@@ -2,9 +2,9 @@ nextflow.enable.dsl=2
 
 // All input parameters are read from Nextflow config file "inputs.nf"
 
-include { cellbender_workflow } from './cellbender_workflow.nf'
-include { multiplet_workflow } from './multiplet_workflow.nf'
-include { celltype_pred_workflow } from './celltype_pred_workflow.nf'
+include { cellbender_workflow as CB_1 } from './cellbender_workflow.nf'
+include { multiplet_workflow as MU_2 } from './multiplet_workflow.nf'
+include { celltype_pred_workflow as CT_3 } from './celltype_pred_workflow.nf'
 
 workflow {
     
@@ -13,7 +13,6 @@ workflow {
 	.splitCsv(header: true, sep: '\t')
 	.map{row->tuple(row.sanger_sample_id, row.biopsy_type, row.disease_status)}
 	.unique()
-    // .filter { it[2] =~ /.cram$/ }
     
     channel_samples_meta
 	.count().view { "\n --- processing $it samples with biopsy_type and disease_status" }
@@ -188,16 +187,16 @@ workflow {
 
 
     // all prepared channels:
-    ch_experimentid_paths10x_raw.take(1).view()
-    ch_experimentid_paths10x_filtered.take(1).view()
-    channel__file_paths_10x.take(1).view()
-    ncells_cellranger.take(1).view()
-    sample_tirectum_cellbender_params.take(1).view()
-    sample_tirectum_scrublet_params.take(1).view()
+//    ch_experimentid_paths10x_raw.take(1).view()
+//    ch_experimentid_paths10x_filtered.take(1).view()
+//    channel__file_paths_10x.take(1).view()
+//    ncells_cellranger.take(1).view()
+//    sample_tirectum_cellbender_params.take(1).view()
+//    sample_tirectum_scrublet_params.take(1).view()
     
     if (params.run_cellbender_workflow) {
-	log.info ' ---- running cellbender workflow ---- '
-	cellbender_workflow(
+	log.info '\n ---- running cellbender workflow ---- '
+	CB_1(
 	    // sample, path to cellranger raw_feature_bc_matrix folder
 	    ch_experimentid_paths10x_raw,
 	    
@@ -214,24 +213,16 @@ workflow {
 	    ncells_cellranger,
 	    
 	    // sample, cellbender param 1 ... n
-	    sample_tirectum_cellbender_params
-	) 
-
+	    sample_tirectum_cellbender_params) 
 
 	if (params.run_multiplet_workflow) {
 	    log.info '\n --- running multiplet workflow ---- '
-
-            multiplet_workflow(
-		cellbender_workflow.out.filt10x
+            MU_2(CB_1.out.filt10x
 		    .join(sample_tirectum_scrublet_params, by: [0,1]))
 
 	    if (params.run_celltype_pred_workflow) {
-		log.info ' ---- running keras cell type prediction workflow ---- '
-	  	celltype_pred_workflow(multiplet_workflow.out.keras_input)
-	    }
-	}
-    }            
-}
+		log.info '\n ---- running keras cell type prediction workflow ---- '
+	  	CT_3(MU_2.out.keras_input)}}}}
 
 workflow.onError {
     log.info "\n\n\n --- Pipeline execution stopped with the following message: ${workflow.errorMessage}" }
@@ -241,7 +232,7 @@ workflow.onComplete {
     log.info "\n --- Command line: $workflow.commandLine"
     log.info "\n --- Execution status: ${ workflow.success ? 'OK' : 'failed' }\n"
 
-    if (params.on_complete.sync_results_to_gitlab) {
+    if (params.on_complete.sync_results_to_gitlab && ("${workflow.success}" == "OK")) {
 	log.info "\n --- Sync results to gitlab: run script bin/sync_results_to_gitlab.sh\n"
 	def proc = "bash ${projectDir}/../bin/sync_results_to_gitlab.sh ${projectDir}/../results".execute()
 	def b = new StringBuffer()

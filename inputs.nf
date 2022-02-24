@@ -1,6 +1,6 @@
 params {
 
-    // path to directory where cellranger 10xx directories are 3 depth down, where name of 10x dir is name of sample.
+    // path to directory where cellranger 10x directories are 3 depths down, where name of 10x dir is name of sample.
     cellranger_10x_dir = '/lustre/scratch119/humgen/projects/sc-eqtl-ibd/data/scrna_cellranger/results/iget_cellranger/full_data'
 
     // path to tab-delimited table with columns row.sanger_sample_id, row.biopsy_type, row.disease_status
