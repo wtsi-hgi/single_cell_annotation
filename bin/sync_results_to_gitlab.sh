@@ -34,13 +34,15 @@ git add ./sync_status/keras_celltypes/timeline.html
 mkdir -p ./sync_status/keras_celltypes/cellbender
 mkdir -p ./sync_status/keras_celltypes/multiplets
 mkdir -p ./sync_status/keras_celltypes/celltypes
+mkdir -p ./sync_status/keras_celltypes/merge
 find ../cellbender/3_preprocess_output -maxdepth 2 -mindepth 2 | sort -o ./sync_status/keras_celltypes/cellbender/processed_samples.txt
 find ../multiplet/1_scrublet -maxdepth 2 -mindepth 2 | sort -o ./sync_status/keras_celltypes/multiplets/processed_samples.txt
 find ../celltype_prediction/1_keras -maxdepth 2 -mindepth 2 | sort -o ./sync_status/keras_celltypes/celltypes/processed_samples.txt
+find ../merge/1_merge -maxdepth 1 -mindepth 1 | sort -o ./sync_status/keras_celltypes/merge/processed_biopsy_types.txt
 git add ./sync_status/keras_celltypes/cellbender/processed_samples.txt
 git add ./sync_status/keras_celltypes/multiplets/processed_samples.txt
 git add ./sync_status/keras_celltypes/celltypes/processed_samples.txt
-
+git add ./sync_status/keras_celltypes/merge/processed_biopsy_types.txt
 
 git commit -m "keras pipeline run complete"
 git push

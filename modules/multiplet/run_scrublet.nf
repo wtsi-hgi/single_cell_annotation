@@ -2,6 +2,7 @@ process run_scrublet {
     // Runs scrublet for each sample.
     // ------------------------------------------------------------------------
     
+    tag { "$experiment_id" }
     publishDir  path: "${params.outdir}/multiplet/1_scrublet/${biopsy_type}/${experiment_id}",
         saveAs: {filename ->
         if (filename.endsWith("multiplet_calls_published.txt")) {

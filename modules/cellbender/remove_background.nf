@@ -6,6 +6,7 @@ process remove_background {
   //maxForks 2   // hard to control memory usage. limit to 3 concurrent
 // cb_plot_input,out_paths,results_list,experimentid_outdir_cellbenderunfiltered_expectedcells_totaldropletsinclude
 
+  tag { "$experiment_id" }
   publishDir  path: "${params.outdir}/cellbender/2_remove_background/${biopsy_type}/${experiment_id}",
       saveAs: {filename ->
         if (filename == "barcodes.tsv.gz") {

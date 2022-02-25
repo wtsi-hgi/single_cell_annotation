@@ -1,6 +1,4 @@
 process remove_background__qc_plots_2 {
-
-
   // Second set of QC plots from cellbdender.
   // This task compare the cellbender output with both the cellranger filtered and cellragner raw outputs
   // ------------------------------------------------------------------------

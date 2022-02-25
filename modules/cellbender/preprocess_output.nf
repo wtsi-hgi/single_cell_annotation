@@ -1,5 +1,6 @@
-
 process preprocess_output {
+
+    tag { "$experiment_id" }
     publishDir  path: "${params.outdir}/cellbender/3_preprocess_output/${biopsy_type}/${experiment_id}",
         saveAs: {filename ->
         if (filename == "barcodes.tsv.gz") {

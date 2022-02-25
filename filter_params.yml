@@ -1,0 +1,31 @@
+sample_qc:
+    description: 'Parameters for sample QC prior to merge.
+        Filters are applied to all samples.'
+    cell_filters:
+        description: 'Cell filters. Each bullet point is a seperate filter.
+            Cells that evaluate to true for any of these filters, will be
+            removed. Filters under "all_samples" are applied to all samples.
+            Filters under a sample id are applied to that specific sample.
+            Examples:   (pct_counts_gene_group__mito_transcript > 50)
+                        (n_genes_by_counts < 100)
+                        (scrublet__predicted_multiplet == True)
+            '
+        all_samples:
+            description: 'Cell filters applied to all samples.'
+            value:
+                - 'scrublet__predicted_multiplet == True'
+                - 'predicted_celltype_probability < 0.5'
+    downsample_cells_fraction:
+        description: 'Downsample to this fraction of the number of
+            observations (sc.pp.subsample). Use "" to indicate no downsampling.
+            Example: if 0.8, will drop 20% of cells.'
+        value: ''
+    downsample_cells_n:
+        description: 'Downsample to this number of observations
+            (sc.pp.subsample). Use "" to indicate no downsampling. Example: if
+            200 then 200 total cells will be kept.'
+        value: ''
+    downsample_feature_counts:
+        description: 'Downsample the number of feature counts by this fraction.
+            Use "" to indicate no downsampling.'
+        value: ''
