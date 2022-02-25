@@ -12,10 +12,14 @@ params {
     run_cellbender_workflow = true
     run_multiplet_workflow = true // can only run if run_cellbender_workflow has run
     run_celltype_pred_workflow = true // can only run if run_multiplet_workflow has run
+    run_merge_workflow = true // can only run if run_celltype_pred_workflow has run
     on_complete { sync_results_to_gitlab = true } // push some outputs to gitlab repo in workflow.onComplete{}
     
     copy_mode = "rellink" // publish relative links from work to results publish dir
     mem_gpu = 10000 // Gb RAM memory for cellbender gpu task
+
+    // subsample input samples for pipeline development? specfic n or -1 for all (not subsampling)
+    subsample_dev_n = -1
 
     cellbender {
 	estimate_params_umis {
@@ -80,7 +84,6 @@ params {
     }
 
     celltype_prediction {
-
 	// parameters for the keras celltype prediction python script
         keras {
 	    keras_model = '/lustre/scratch119/humgen/projects/sc-eqtl-ibd/analysis/freeze_003/ti-cd_healthy/sc_qc_cluster/pca_plus5/cellbender_fpr0pt1_filteroutlier_0pt1/nf_results/normalize=total_count.vars_to_regress=none.hvg_exclude=data-variable_gene_filter.scores=data-gene_scores/reduced_dims-vars_to_regress=none-bbknn.batch=experiment_id.n_pcs=29/cluster.number_neighbors=-1.method=leiden.resolution=3.0/validate_resolution/adata-normalized_pca-bbknn-umap-clustered-sparsity_l1=1pt0E-4-train_size_cells=-1.h5'
@@ -94,5 +97,11 @@ params {
 	    save_all_probabilities = '--save_all_probabilities'
 	}
     }
-
+    
+    merge {
+	filter_params = '/lustre/scratch119/humgen/projects/sc-eqtl-ibd/data/scrna_cellranger/single_cell_annotation/filter_params.yml'
+	metadata_key = 'sanger_sample_id'
+	anndata_compression_opts = '9'
+    }
 }
+

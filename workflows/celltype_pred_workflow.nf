@@ -8,6 +8,10 @@ workflow celltype_pred_workflow {
         // Identify multiplets using scrublet.
     run_keras_celltype_prediction(keras_input)
     
-    //emit:
-    //    multiplet_calls = run_scrublet.out.multiplet_calls
+    emit:
+    to_merge = run_keras_celltype_prediction.out.to_merge
+        //val(biopsy_type),
+        //val(experiment_id),
+        //path("*predictions.h5ad"), 
+        //emit: to_merge)
 }

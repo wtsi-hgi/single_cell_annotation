@@ -2,6 +2,7 @@ process get_input_cells {
   // Calculates thresholds for input cells of remove_background
   // ------------------------------------------------------------------------
 
+  tag { "$experiment_id" }
     publishDir path: "${params.outdir}/cellbender/1_get_input_cells/${biopsy_type}/${experiment_id}",
 	mode: "${params.copy_mode}",
 	overwrite: "true"
