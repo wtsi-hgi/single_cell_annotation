@@ -18,6 +18,9 @@ params {
     copy_mode = "rellink" // publish relative links from work to results publish dir
     mem_gpu = 10000 // Gb RAM memory for cellbender gpu task
 
+    // subsample input samples for pipeline development? specfic n or -1 for all (not subsampling)
+    subsample_dev_n = -1
+
     cellbender {
 	estimate_params_umis {
 	    use_cellranger_estimate = false // TODO: set to true to use cellranger n estimated cells

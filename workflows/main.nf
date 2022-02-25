@@ -143,7 +143,7 @@ workflow {
         .map { row -> [row[0],row[1].replaceAll(/^"/,'')] } // remove extra "
         .map { row -> [row[0],row[1].replaceAll(/,/,'')] } // remove extra ,
         .map { row -> [row[0],row[1].replaceAll(/".*/,'')] } // remove extra 2nd column when n cells < 1000
-	.take(2).set {sample_cellranger_estimated_n_cells}
+	.take(params.subsample_dev_n).set {sample_cellranger_estimated_n_cells}
     
     sample_cellranger_estimated_n_cells
 	.count().view { "\n --- extracted $it n cellranger_estimated_n_cells from metrics_summary.csv files " }
