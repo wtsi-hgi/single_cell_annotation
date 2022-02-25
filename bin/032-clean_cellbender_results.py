@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-
-__author__ = 'Henry Taylor'
 __date__ = '2020-07-09'
 __version__ = '0.0.1'
 
