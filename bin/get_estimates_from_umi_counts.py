@@ -32,7 +32,7 @@ np.random.seed(seed_value)
 # Set env vars
 os.environ['NUMBA_CACHE_DIR'] = os.getenv('TMPDIR', '/tmp')
 os.environ['MPLCONFIGDIR'] =os.getenv('TMPDIR', '/tmp')
-                    
+
 # Set valid methods for estimators
 valid_methods = [
     'dropletutils::barcoderanks::inflection',
@@ -726,7 +726,9 @@ def main():
                 'estimated_ndroplets - estimated_ncells is negative!'
             )
         if diff < min_ranked_barcode_cell_droplet_dist:
-            estimated_ncells = estimated_ncells - diff
+            estimated_ncells = estimated_ncells - (
+                min_ranked_barcode_cell_droplet_dist - diff
+            )
     # Add the final estimate to the output dict
     cell_estimate_outdict.append({
         'method': 'estimated_ncells',
