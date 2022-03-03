@@ -5,11 +5,12 @@ nextflow.enable.dsl=2
 include { cellbender_workflow as CB_1 } from './cellbender_workflow.nf'
 include { multiplet_workflow as MU_2 } from './multiplet_workflow.nf'
 include { celltype_pred_workflow as CT_3 } from './celltype_pred_workflow.nf'
+include { merge_workflow as ME_4 } from './merge_workflow.nf'
 
 workflow {
     
     channel_samples_meta = Channel
-	.fromPath(params.samples_metainfo_tsv)
+	.fromPath(params.samples_metainfo_tsv, checkIfExists: true)
 	.splitCsv(header: true, sep: '\t')
 	.map{row->tuple(row.sanger_sample_id, row.biopsy_type, row.disease_status)}
 	.unique()
@@ -142,7 +143,7 @@ workflow {
         .map { row -> [row[0],row[1].replaceAll(/^"/,'')] } // remove extra "
         .map { row -> [row[0],row[1].replaceAll(/,/,'')] } // remove extra ,
         .map { row -> [row[0],row[1].replaceAll(/".*/,'')] } // remove extra 2nd column when n cells < 1000
-	.take(4).set {sample_cellranger_estimated_n_cells}
+	.take(params.subsample_dev_n).set {sample_cellranger_estimated_n_cells}
     
     sample_cellranger_estimated_n_cells
 	.count().view { "\n --- extracted $it n cellranger_estimated_n_cells from metrics_summary.csv files " }
@@ -222,7 +223,12 @@ workflow {
 
 	    if (params.run_celltype_pred_workflow) {
 		log.info '\n ---- running keras cell type prediction workflow ---- '
-	  	CT_3(MU_2.out.keras_input)}}}}
+	  	CT_3(MU_2.out.keras_input)
+		
+		if (params.run_merge_workflow) {
+		    log.info '\n ---- running merge workflow ---- '
+	  	    ME_4(CT_3.out.to_merge)
+		}}}}}
 
 workflow.onError {
     log.info "\n\n\n --- Pipeline execution stopped with the following message: ${workflow.errorMessage}" }
@@ -232,7 +238,7 @@ workflow.onComplete {
     log.info "\n --- Command line: $workflow.commandLine"
     log.info "\n --- Execution status: ${ workflow.success ? 'OK' : 'failed' }\n"
 
-    if (params.on_complete.sync_results_to_gitlab && ("${workflow.success}" == "OK")) {
+    if (params.on_complete.sync_results_to_gitlab && workflow.success) {
 	log.info "\n --- Sync results to gitlab: run script bin/sync_results_to_gitlab.sh\n"
 	def proc = "bash ${projectDir}/../bin/sync_results_to_gitlab.sh ${projectDir}/../results".execute()
 	def b = new StringBuffer()

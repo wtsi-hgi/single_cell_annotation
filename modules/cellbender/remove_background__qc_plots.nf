@@ -1,5 +1,6 @@
 process remove_background__qc_plots {
 
+  tag { "$experiment_id" }
   publishDir  path: "${params.outdir}/cellbender/4.1_qc_plots/${biopsy_type}/${experiment_id}",
       saveAs: {filename ->
         if (filename.equalsIgnoreCase("barcodes.tsv.gz")) {
