@@ -216,6 +216,19 @@ workflow {
 	    // sample, cellbender param 1 ... n
 	    sample_tirectum_cellbender_params) 
 
+	CB_1.out.custom_qc_pipeline_input
+	    .map { a,b,c,d -> tuple(a, b, c, file(d).baseName) } // get dir name of cellbender 10x output
+	    .map {
+	        biopsy_type,
+	        experiment_id,
+		out_prefix,
+		path_filtered_10x_mtx -> tuple (biopsy_type, "${experiment_id}\t${out_prefix}${path_filtered_10x_mtx}") }
+	    .collectFile(storeDir: "${params.outdir}/",
+	                 seed: "experiment_id\tdata_path_10x_format",
+	                 sort: true) { item ->
+	    [ "${item[0]}.nf_scrna_qc_cellbender_inputs.tsv", '\n' + item[1] ]
+	}
+	
 	if (params.run_multiplet_workflow) {
 	    log.info '\n --- running multiplet workflow ---- '
             MU_2(CB_1.out.filt10x

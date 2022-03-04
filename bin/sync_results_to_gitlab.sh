@@ -30,6 +30,10 @@ git add ./sync_status/keras_celltypes/trace.txt
 cp ../../reports/timeline.html ./sync_status/keras_celltypes/
 git add ./sync_status/keras_celltypes/timeline.html
 
+# cp nf_scrna_qc inputs
+cp ../*.nf_scrna_qc_cellbender_inputs.tsv ./sync_status/keras_celltypes/
+git add ./sync_status/keras_celltypes/*.nf_scrna_qc_cellbender_inputs.tsv
+
 # list all samples processed
 mkdir -p ./sync_status/keras_celltypes/cellbender
 mkdir -p ./sync_status/keras_celltypes/multiplets
