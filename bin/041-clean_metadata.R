@@ -73,6 +73,7 @@ main <- function() {
         'age',
         'smoking_status',
         'experimentalist',
+        'protocol',
         'enzyme_lot_BLP',
         'bead_version',
         'bead_lot',
