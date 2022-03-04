@@ -100,7 +100,7 @@ workflow cellbender_workflow {
     
 
     preprocess_output(remove_background.out.experimentid_cellbender_to_preprocess)
-	
+
     // Make some basic plots
     remove_background__qc_plots(
         preprocess_output.out.experiment_id_cb_plot_input)
@@ -114,5 +114,6 @@ workflow cellbender_workflow {
     
     emit:
     filt10x = preprocess_output.out.filt10x
+    custom_qc_pipeline_input = preprocess_output.out.custom_qc_pipeline_input
 }
 
