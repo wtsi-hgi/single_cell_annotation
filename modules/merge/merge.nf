@@ -19,8 +19,9 @@ process merge {
         emit: biopsy_type_h5ad)
     tuple(
         val(biopsy_type),
+        path("*.h5ad"),
         path("*-cell_filtered_per_experiment.tsv.gz"),
-        emit: cell_filtered_per_experiment_tsv_gz)
+        emit: to_plot)
     path("input_file_paths.tsv")
     
     script:
