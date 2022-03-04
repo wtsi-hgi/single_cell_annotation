@@ -32,6 +32,14 @@ process preprocess_output {
     
     output:
     tuple(
+	val(biopsy_type),
+	val(experiment_id),
+	val("${params.outdir}/cellbender/3_preprocess_output/${biopsy_type}/${experiment_id}/"),
+	path("*filtered_10x_mtx"),
+      emit: custom_qc_pipeline_input
+    )
+
+    tuple(
 	val(experiment_id),
 	val(biopsy_type),
 	path("*filtered_10x_mtx/barcodes.tsv.gz"),
