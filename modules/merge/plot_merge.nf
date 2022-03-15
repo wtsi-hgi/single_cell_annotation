@@ -27,6 +27,6 @@ python ${projectDir}/../bin/043-plot_final_data.py \\
 
 # plot to check for sample swaps:
 python ${projectDir}/../bin/028-plot_sex.py \\
-  --h5ad_file ${merged_h5ad}
+  --h5_anndata ${merged_h5ad}
 """
 }
