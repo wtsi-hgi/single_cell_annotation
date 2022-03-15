@@ -24,7 +24,9 @@ python ${projectDir}/../bin/043-plot_filtered_cells.py \\
 
 python ${projectDir}/../bin/043-plot_final_data.py \\
   --h5ad_file ${merged_h5ad}
+
+# plot to check for sample swaps:
+python ${projectDir}/../bin/028-plot_sex.py \\
+  --h5_anndata ${merged_h5ad}
 """
 }
-
-//--tsv_file /lustre/scratch119/realdata/mdt2/projects/sc-eqtl-ibd/analysis/leland_dev/cdi/adata-cell_filtered_per_experiment.tsv.gz
