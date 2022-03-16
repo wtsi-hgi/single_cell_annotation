@@ -16,7 +16,7 @@ workflow merge_workflow {
     	  Channel.fromPath(params.samples_metainfo_tsv, checkIfExists: true).collect(),
     	  Channel.fromPath(params.merge.filter_params, checkIfExists: true).collect())
     
-    plot_merge(merge.out.cell_filtered_per_experiment_tsv_gz)
+    plot_merge(merge.out.to_plot)
     
     emit:
     merged_h5ad = merge.out.biopsy_type_h5ad

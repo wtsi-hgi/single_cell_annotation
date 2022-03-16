@@ -8,6 +8,7 @@ process plot_merge {
     input:
     tuple(
         val(biopsy_type),
+        path(merged_h5ad),
         path(tsv_file_gz))
     
     output:
@@ -20,6 +21,9 @@ process plot_merge {
 """
 python ${projectDir}/../bin/043-plot_filtered_cells.py \\
   --tsv_file ${tsv_file_gz}
+
+python ${projectDir}/../bin/043-plot_final_data.py \\
+  --h5ad_file ${merged_h5ad}
 """
 }
 
