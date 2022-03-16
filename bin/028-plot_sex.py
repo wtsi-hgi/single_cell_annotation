@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+
 __date__ = '2020-05-20'
 __version__ = '0.0.1'
 
@@ -47,12 +48,14 @@ def main():
 
     parser.add_argument(
         '-o', '--output_file',
-        default='scatterplot-sex_sample_swap_check',
+        default='sex_check',
         dest='o',
         help='Basename for output files.'
     )
 
     options = parser.parse_args()
+
+    output_file = options.o
 
     # Load the AnnData file
     adata = sc.read_h5ad(filename=options.h5)
@@ -177,7 +180,7 @@ def main():
         #     "CDY1"
         # ]
 
-    # Make the plot
+    # Prep data for the plot
     adata.var['X_chr-gene'] = np.in1d(adata.var.index, X)
     adata.var['Y_chr-gene'] = np.in1d(adata.var.index, Y)
     adata.obs['X_chr-sum'] = adata[:, adata.var['X_chr-gene']].X.todense(
@@ -197,10 +200,25 @@ def main():
     plt = plt + plt9.ylab("Mean Y chr gene expression (counts)")
     plt = plt + plt9.xlab(X_lab)
     plt.save(
-        '{}.png'.format(options.o),
+        '{}-scatterplot.png'.format(output_file),
         # dpi=300,
         width=4,
         height=4
+    )
+
+    # Add predicted cell type
+    df['sex_predicted'] = 'F'
+    filt = (df['Y_chr-sum'] > df['X_chr-sum'])
+    df['sex_predicted'][filt] = 'M'
+
+    # Write a file of instances where the predicted sex does not match
+    # the annotated sex
+    df_wrong = df.loc[(df['sex'] != df['sex_predicted'])]
+    df_wrong.to_csv(
+        '{}-predicted_sex_not_match_annotated.tsv'.format(output_file),
+        sep='\t',
+        # compression='gzip',
+        na_rep='',
     )
 
 
