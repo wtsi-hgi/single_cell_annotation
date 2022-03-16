@@ -15,6 +15,7 @@ process plot_merge {
     tuple(
         val(biopsy_type),
         path("*.png"),
+        path("*predicted_sex_not_match_annotated.tsv"),
         emit: out)
     
     script:
