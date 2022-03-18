@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-
-__date__ = '2020-05-20'
-__version__ = '0.0.1'
-
 import argparse
 import numpy as np
 import pandas as pd

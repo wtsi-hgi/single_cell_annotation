@@ -2,7 +2,6 @@
 
 library(optparse)
 
-
 main <- function() {
     optionList <- list(
         optparse::make_option(c("-i", "--input_file"),

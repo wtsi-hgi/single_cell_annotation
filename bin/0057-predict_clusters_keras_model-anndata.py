@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-__date__ = '2021-12-01'
-__version__ = '0.0.2'
-
-
 import argparse
 import os
 import random

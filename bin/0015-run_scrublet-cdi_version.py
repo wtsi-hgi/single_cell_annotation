@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 
-__date__ = '2020-03-13'
-__version__ = '0.0.2'
-
 import argparse
 from distutils.version import LooseVersion
 import os

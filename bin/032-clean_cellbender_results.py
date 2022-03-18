@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 
-__date__ = '2020-07-09'
-__version__ = '0.0.1'
-
 import argparse
 import os
 os.environ['NUMBA_CACHE_DIR']='/tmp'

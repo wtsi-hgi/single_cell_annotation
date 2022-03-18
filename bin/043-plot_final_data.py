@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 
-__date__ = '2022-03-03'
-__version__ = '0.0.1'
-
 import argparse
 import os
 import scanpy as sc

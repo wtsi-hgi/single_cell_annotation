@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-__author__ = 'Guillaume Noell'
-__date__ = '2021-07-08'
-__version__ = '0.0.1'
-
 import argparse
 import os
 os.environ['NUMBA_CACHE_DIR']='/tmp'

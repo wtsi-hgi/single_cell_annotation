@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-__date__ = '2020-10-27'
-__version__ = '0.0.1'
-
-
 import os
 os.environ['NUMBA_CACHE_DIR']='/tmp'
 os.environ['MPLCONFIGDIR']='/tmp'
