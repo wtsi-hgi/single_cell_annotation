@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-
-__date__ = '2022-02-23'
-__version__ = '0.0.1'
-
 import argparse
 # import csv
 import os

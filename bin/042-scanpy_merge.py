@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 
-__date__ = '2022-02-24'
-__version__ = '0.0.1'
-
 import argparse
 from distutils.version import LooseVersion
 import csv
